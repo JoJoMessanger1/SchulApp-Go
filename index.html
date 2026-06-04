@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SchulApp</title>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c27;
+  --surface3: #242433;
+  --accent: #6c63ff;
+  --accent-glow: rgba(108,99,255,.35);
+  --accent2: #ff6b6b;
+  --accent3: #43e97b;
+  --text-primary: #f0f0ff;
+  --text-sec: #8888aa;
+  --border: rgba(255,255,255,.08);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 8px 32px rgba(0,0,0,.6);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; background:var(--bg); color:var(--text-primary); font-family:"Segoe UI",system-ui,sans-serif; overflow:hidden; }
+
+/* LOGIN */
+#loginScreen {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  height:100vh; padding:24px;
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%,rgba(108,99,255,.3),transparent);
+}
+.login-logo { font-size:52px; margin-bottom:8px; }
+.login-brand { font-size:28px; font-weight:700; letter-spacing:.06em; }
+.login-sub { color:var(--text-sec); margin-bottom:36px; font-size:14px; }
+.login-card {
+  width:100%; max-width:360px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--radius);
+  padding:28px 24px; box-shadow:var(--shadow);
+}
+.login-card label { display:block; font-size:12px; color:var(--text-sec); margin-bottom:6px; letter-spacing:.05em; text-transform:uppercase; }
+.login-card input {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:12px 14px; color:var(--text-primary);
+  font-size:15px; margin-bottom:18px; transition:border-color .2s;
+}
+.login-card input:focus { outline:none; border-color:var(--accent); }
+#loginBtn {
+  width:100%; background:var(--accent); color:#fff; border:none;
+  border-radius:var(--radius-sm); padding:13px; font-size:15px;
+  font-weight:600; cursor:pointer; letter-spacing:.04em;
+  transition:opacity .2s, transform .1s; margin-top:4px;
+}
+#loginBtn:hover { opacity:.88; }
+#loginBtn:active { transform:scale(.98); }
+#loginBtn:disabled { opacity:.5; cursor:not-allowed; }
+
+/* APP SHELL */
+#appShell { display:none; flex-direction:column; height:100vh; }
+.main-content { flex:1; overflow-y:auto; padding:20px 16px 90px; scrollbar-width:none; }
+.main-content::-webkit-scrollbar { display:none; }
+.fade-in { animation:fadeIn .25s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+/* NAVBAR */
+.navbar {
+  display:flex; background:var(--surface); border-top:1px solid var(--border);
+  padding:6px 0 calc(6px + env(safe-area-inset-bottom)); flex-shrink:0; z-index:100;
+}
+.nav-btn {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  background:none; border:none; color:var(--text-sec); cursor:pointer;
+  padding:6px 2px; font-size:11px; transition:color .2s;
+}
+.nav-btn .nav-icon { font-size:20px; transition:transform .2s; }
+.nav-btn.active { color:var(--accent); }
+.nav-btn.active .nav-icon { transform:translateY(-2px); }
+
+/* HOME */
+.home-hero {
+  text-align:center; padding:32px 16px 24px;
+  background:linear-gradient(135deg,var(--surface2),var(--surface3));
+  border-radius:var(--radius); border:1px solid var(--border); margin-bottom:20px;
+}
+.home-greeting { font-size:16px; color:var(--text-sec); }
+.home-name { font-size:32px; font-weight:700; letter-spacing:-.01em; }
+.home-role-badge {
+  display:inline-block; background:var(--accent); color:#fff;
+  border-radius:20px; padding:3px 12px; font-size:12px; margin:10px 0 18px;
+}
+.home-clock {
+  font-size:42px; font-weight:700; letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;
+}
+.home-date { color:var(--text-sec); font-size:14px; margin-top:6px; }
+.home-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.home-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px 8px;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  cursor:pointer; transition:background .2s, transform .1s;
+}
+.home-card:hover { background:var(--surface2); transform:translateY(-2px); }
+.card-icon { font-size:26px; }
+.card-label { font-size:12px; color:var(--text-sec); text-align:center; }
+
+/* CALENDAR */
+.cal-topbar { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.cal-month-label { flex:1; text-align:center; font-size:17px; font-weight:600; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:16px; }
+.cal-header-cell { text-align:center; font-size:11px; color:var(--text-sec); padding:4px 0; font-weight:600; }
+.cal-cell {
+  aspect-ratio:1; background:var(--surface); border-radius:var(--radius-sm);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer; border:1px solid transparent; transition:background .15s; position:relative; gap:2px;
+}
+.cal-cell:hover { background:var(--surface2); }
+.cal-cell.today { border-color:var(--accent); background:rgba(108,99,255,.15); }
+.cal-cell.empty { background:transparent; border:none; cursor:default; }
+.cal-day-num { font-size:13px; }
+.cal-dot {
+  background:var(--accent); color:#fff; border-radius:50%;
+  font-size:9px; width:15px; height:15px;
+  display:flex; align-items:center; justify-content:center;
+}
+.cal-dot--class { background:var(--accent3); }
+.cal-events-list { display:flex; flex-direction:column; gap:10px; }
+.event-item {
+  background:var(--surface); border-left:3px solid var(--accent);
+  border-radius:var(--radius-sm); padding:12px 14px; position:relative;
+}
+.event-item--class { border-color:var(--accent3); }
+.event-title { font-weight:600; font-size:14px; padding-right:28px; }
+.event-meta { font-size:12px; color:var(--text-sec); margin-top:3px; }
+.del-btn { position:absolute; top:10px; right:10px; background:none; border:none; cursor:pointer; font-size:14px; }
+
+/* PERSONS */
+.persons-list { display:flex; flex-direction:column; gap:10px; }
+.person-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px;
+  display:flex; align-items:center; gap:14px;
+}
+.person-avatar {
+  width:42px; height:42px; border-radius:50%; background:var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:700; flex-shrink:0;
+}
+.person-info { flex:1; min-width:0; }
+.person-name { font-weight:600; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.person-email { font-size:12px; color:var(--text-sec); }
+.person-badge { font-size:11px; color:var(--text-sec); white-space:nowrap; }
+
+/* CLASS */
+.class-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px; cursor:pointer;
+  margin-bottom:10px; transition:background .15s;
+}
+.class-card:hover { background:var(--surface2); }
+.class-name { font-size:18px; font-weight:700; }
+.class-meta { color:var(--text-sec); font-size:13px; margin-top:4px; }
+.class-events-section { margin-bottom:18px; }
+.class-event-item {
+  background:var(--surface); border-left:3px solid var(--accent3);
+  border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:8px;
+}
+.add-to-cal-btn {
+  margin-top:8px; background:var(--accent); color:#fff; border:none;
+  border-radius:20px; padding:5px 14px; font-size:12px; cursor:pointer;
+}
+.section-title {
+  font-size:13px; color:var(--text-sec); text-transform:uppercase;
+  letter-spacing:.08em; margin:16px 0 10px;
+}
+
+/* NEWS */
+.news-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px; margin-bottom:12px;
+}
+.news-date { font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+.news-title { font-size:17px; font-weight:700; margin-bottom:8px; }
+.news-body { font-size:14px; color:var(--text-sec); line-height:1.6; }
+
+/* PROFILE */
+.profile-wrap { display:flex; flex-direction:column; align-items:center; padding:24px 16px; }
+.profile-avatar-large {
+  width:80px; height:80px; border-radius:50%; background:var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  font-size:34px; font-weight:700;
+  box-shadow:0 0 0 4px var(--accent-glow); margin-bottom:14px;
+}
+.profile-name { font-size:22px; font-weight:700; }
+.profile-email { color:var(--text-sec); font-size:14px; margin:4px 0; }
+.profile-role { color:var(--accent); font-size:13px; margin-bottom:24px; }
+.profile-actions { width:100%; max-width:320px; display:flex; flex-direction:column; gap:10px; }
+.profile-btn {
+  background:var(--surface); border:1px solid var(--border); color:var(--text-primary);
+  border-radius:var(--radius-sm); padding:13px; font-size:14px;
+  cursor:pointer; text-align:left; transition:background .15s;
+}
+.profile-btn:hover { background:var(--surface2); }
+.profile-btn--logout { border-color:var(--accent2); color:var(--accent2); }
+
+/* SHARED */
+.page-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.page-header h2 { flex:1; font-size:20px; font-weight:700; }
+.fab-inline {
+  width:36px; height:36px; border-radius:50%; background:var(--accent);
+  border:none; color:#fff; font-size:20px; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 4px 14px var(--accent-glow); flex-shrink:0;
+}
+.icon-btn {
+  background:var(--surface); border:1px solid var(--border); color:var(--text-primary);
+  border-radius:var(--radius-sm); padding:6px 14px; font-size:18px; cursor:pointer;
+}
+.no-events { color:var(--text-sec); font-size:14px; text-align:center; padding:24px; }
+.error-msg { color:var(--accent2); font-size:14px; padding:20px; text-align:center; }
+
+/* MODAL */
+#modalOverlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.7);
+  z-index:999; align-items:flex-end; justify-content:center;
+}
+#modalOverlay.active { display:flex; }
+.modal-sheet {
+  background:var(--surface); border-radius:20px 20px 0 0;
+  width:100%; max-width:480px; padding:24px;
+  max-height:85vh; overflow-y:auto;
+  animation:slideUp .3s cubic-bezier(.22,1,.36,1);
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:none} }
+.modal-sheet h3 { font-size:18px; font-weight:700; margin-bottom:18px; }
+.modal-sheet label {
+  display:block; font-size:12px; color:var(--text-sec);
+  margin-bottom:5px; text-transform:uppercase; letter-spacing:.05em;
+}
+.modal-sheet input,
+.modal-sheet select,
+.modal-sheet textarea {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:11px 13px;
+  color:var(--text-primary); font-size:14px; margin-bottom:14px;
+  font-family:inherit;
+}
+.modal-sheet input:focus,
+.modal-sheet select:focus,
+.modal-sheet textarea:focus { outline:none; border-color:var(--accent); }
+.modal-sheet textarea { resize:vertical; }
+.modal-btn {
+  width:100%; background:var(--accent); color:#fff; border:none;
+  border-radius:var(--radius-sm); padding:13px; font-size:15px;
+  font-weight:600; cursor:pointer; margin-top:4px;
+}
+.modal-btn--secondary { background:var(--surface2); color:var(--text-primary); margin-top:8px; }
+.member-select-list { max-height:200px; overflow-y:auto; margin-bottom:14px; }
+.member-check {
+  display:flex; align-items:center; gap:8px; padding:8px;
+  border-radius:6px; cursor:pointer;
+}
+.member-check:hover { background:var(--surface3); }
+.member-check input { width:auto; margin:0; }
+.cred-box {
+  background:var(--surface2); border:1px solid var(--accent);
+  border-radius:var(--radius-sm); padding:14px; margin:12px 0;
+  font-size:14px; line-height:2;
+}
+
+/* TOAST */
+#toastContainer {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  z-index:9999; display:flex; flex-direction:column; gap:8px; pointer-events:none;
+}
+.toast {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:20px; padding:10px 20px; font-size:13px;
+  white-space:nowrap; opacity:0;
+  transition:opacity .3s, transform .3s; transform:translateY(-8px);
+}
+.toast.show { opacity:1; transform:none; }
+.toast--success { border-color:var(--accent3); color:var(--accent3); }
+.toast--error { border-color:var(--accent2); color:var(--accent2); }
+
+/* SPINNER */
+.spinner {
+  width:32px; height:32px; border:3px solid var(--border);
+  border-top-color:var(--accent); border-radius:50%;
+  animation:spin 1s linear infinite; margin:40px auto;
+}
+@keyframes spin { to { transform:rotate(360deg) } }
+
+select option { background:var(--surface2); }
+</style>
+</head>
+<body>
+
+<!-- ════════════ LOGIN SCREEN ════════════ -->
+<div id="loginScreen">
+  <div class="login-logo">🎓</div>
+  <div class="login-brand">SchulApp</div>
+  <div class="login-sub">Nur für autorisierte Mitglieder</div>
+  <div class="login-card">
+    <label for="loginEmail">E-Mail</label>
+    <input id="loginEmail" type="email" placeholder="name@schule.de" autocomplete="email">
+    <label for="loginPass">Passwort</label>
+    <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+    <button id="loginBtn">Anmelden</button>
+  </div>
+</div>
+
+<!-- ════════════ APP SHELL ════════════ -->
+<div id="appShell">
+  <div class="main-content" id="mainContent"></div>
+  <nav class="navbar">
+    <button class="nav-btn" data-tab="home">
+      <span class="nav-icon">🏠</span>Home
+    </button>
+    <button class="nav-btn" data-tab="calendar">
+      <span class="nav-icon">📅</span>Kalender
+    </button>
+    <button class="nav-btn" data-tab="persons">
+      <span class="nav-icon">👥</span>Personen
+    </button>
+    <button class="nav-btn" data-tab="class">
+      <span class="nav-icon">🏫</span>Klasse
+    </button>
+    <button class="nav-btn" data-tab="news">
+      <span class="nav-icon">📰</span>News
+    </button>
+    <button class="nav-btn" data-tab="profile">
+      <span class="nav-icon">👤</span>Profil
+    </button>
+  </nav>
+</div>
+
+<!-- ════════════ MODAL ════════════ -->
+<div id="modalOverlay">
+  <div class="modal-sheet">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ════════════ TOAST ════════════ -->
+<div id="toastContainer"></div>
+
+<!-- ════════════ FIREBASE + APP LOGIC ════════════ -->
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut,
+  sendPasswordResetEmail, createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, collection,
+  getDocs, addDoc, query, where, orderBy,
+  deleteDoc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─────────────────────────────────────────────
+//  FIREBASE CONFIG  ← hier deine Keys eintragen
+// ─────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey:            "DEIN_API_KEY",
+  authDomain:        "DEIN_PROJECT.firebaseapp.com",
+  projectId:         "DEIN_PROJECT_ID",
+  messagingSenderId: "DEIN_SENDER_ID",
+  appId:             "DEIN_APP_ID"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let currentUser     = null;
+let currentUserData = null;
+let activeTab       = "home";
+let calendarDate    = new Date();
+let calendarEvents  = [];
+let classEvents     = [];
+
+// ─────────────────────────────────────────────
+//  UTILITIES
+// ─────────────────────────────────────────────
+function generatePassword(len = 12) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$";
+  return Array.from({ length: len },
+    () => chars[Math.floor(Math.random() * chars.length)]
+  ).join("");
+}
+
+function toast(msg, type = "info") {
+  const t = document.createElement("div");
+  t.className = `toast toast--${type}`;
+  t.textContent = msg;
+  document.getElementById("toastContainer").appendChild(t);
+  setTimeout(() => t.classList.add("show"), 10);
+  setTimeout(() => {
+    t.classList.remove("show");
+    setTimeout(() => t.remove(), 400);
+  }, 3500);
+}
+
+function roleLabel(r) {
+  if (r === "admin")   return "👑 Admin";
+  if (r === "teacher") return "🎓 Lehrer";
+  return "🎒 Schüler";
+}
+
+function showModal(title, bodyHTML) {
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalBody").innerHTML    = bodyHTML;
+  document.getElementById("modalOverlay").classList.add("active");
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("active");
+}
+window.closeModal = closeModal;
+
+// ─────────────────────────────────────────────
+//  ROUTER
+// ─────────────────────────────────────────────
+function renderTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll(".nav-btn").forEach(
+    b => b.classList.toggle("active", b.dataset.tab === tab)
+  );
+  const main = document.getElementById("mainContent");
+  main.innerHTML  = "";
+  main.className  = "main-content fade-in";
+  switch (tab) {
+    case "home":     renderHome(main);     break;
+    case "calendar": renderCalendar(main); break;
+    case "persons":  renderPersons(main);  break;
+    case "class":    renderClass(main);    break;
+    case "news":     renderNews(main);     break;
+    case "profile":  renderProfile(main);  break;
+  }
+}
+window.renderTab = renderTab;
+
+// ─────────────────────────────────────────────
+//  HOME
+// ─────────────────────────────────────────────
+function renderHome(el) {
+  const now     = new Date();
+  const timeStr = now.toLocaleTimeString("de-DE",
+    { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+  const dateStr = now.toLocaleDateString("de-DE",
+    { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+  el.innerHTML = `
+    <div class="home-hero">
+      <div class="home-greeting">Hallo,</div>
+      <div class="home-name">${currentUserData?.name || "Benutzer"}</div>
+      <div class="home-role-badge">${roleLabel(currentUserData?.role)}</div>
+      <div class="home-clock" id="homeClock">${timeStr}</div>
+      <div class="home-date">${dateStr}</div>
+    </div>
+    <div class="home-cards">
+      <div class="home-card" onclick="renderTab('news')">
+        <span class="card-icon">📰</span>
+        <span class="card-label">Neuigkeiten</span>
+      </div>
+      <div class="home-card" onclick="renderTab('calendar')">
+        <span class="card-icon">📅</span>
+        <span class="card-label">Kalender</span>
+      </div>
+      <div class="home-card" onclick="renderTab('class')">
+        <span class="card-icon">🏫</span>
+        <span class="card-label">Meine Klasse</span>
+      </div>
+    </div>`;
+
+  const timer = setInterval(() => {
+    const c = document.getElementById("homeClock");
+    if (!c) { clearInterval(timer); return; }
+    c.textContent = new Date().toLocaleTimeString("de-DE",
+      { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+  }, 1000);
+}
+
+// ─────────────────────────────────────────────
+//  CALENDAR
+// ─────────────────────────────────────────────
+async function loadCalendarEvents() {
+  if (!currentUser) return;
+  try {
+    const snap = await getDocs(
+      query(collection(db, "events"), where("uid", "==", currentUser.uid))
+    );
+    calendarEvents = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    if (currentUserData?.classId) {
+      const cs = await getDocs(
+        query(collection(db, "classEvents"),
+          where("classId", "==", currentUserData.classId))
+      );
+      classEvents = cs.docs.map(d => ({ id: d.id, ...d.data(), isClass: true }));
+    } else {
+      classEvents = [];
+    }
+  } catch (e) { console.error("loadCalendarEvents:", e); }
+}
+
+function renderCalendar(el) {
+  const year  = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay    = (new Date(year, month, 1).getDay() + 6) % 7; // Monday = 0
+  const today       = new Date();
+  const monthNames  = ["Januar","Februar","März","April","Mai","Juni",
+                       "Juli","August","September","Oktober","November","Dezember"];
+  const dayNames    = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+
+  // Build event-day lookup
+  const eventDays = {};
+  [...calendarEvents, ...classEvents].forEach(ev => {
+    const d = (ev.date || "").substring(0, 10);
+    if (d) {
+      if (!eventDays[d]) eventDays[d] = [];
+      eventDays[d].push(ev);
+    }
+  });
+
+  let gridHTML = dayNames.map(d =>
+    `<div class="cal-header-cell">${d}</div>`
+  ).join("");
+
+  gridHTML += Array(firstDay).fill('<div class="cal-cell empty"></div>').join("");
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const isToday = d === today.getDate()
+      && month === today.getMonth()
+      && year  === today.getFullYear();
+    const evs = eventDays[key] || [];
+    const dotClass = evs.some(e => e.isClass) ? "cal-dot cal-dot--class" : "cal-dot";
+    gridHTML += `
+      <div class="cal-cell ${isToday ? "today" : ""}"
+           onclick="window._showDay('${key}')">
+        <span class="cal-day-num">${d}</span>
+        ${evs.length ? `<span class="${dotClass}">${evs.length}</span>` : ""}
+      </div>`;
+  }
+
+  // Selected-day events
+  const selKey = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth()+1).padStart(2,"0")}-${String(calendarDate.getDate()).padStart(2,"0")}`;
+  const selEvs = eventDays[selKey] || [];
+
+  el.innerHTML = `
+    <div class="cal-topbar">
+      <button class="icon-btn" onclick="window._changeMonth(-1)">‹</button>
+      <span class="cal-month-label">${monthNames[month]} ${year}</span>
+      <button class="icon-btn" onclick="window._changeMonth(1)">›</button>
+      <button class="fab-inline" onclick="window._openAddEvent()" title="Ereignis hinzufügen">＋</button>
+    </div>
+    <div class="cal-grid">${gridHTML}</div>
+    <div class="cal-events-list">
+      ${selEvs.length
+        ? selEvs.map(e => `
+            <div class="event-item ${e.isClass ? "event-item--class" : ""}">
+              <div class="event-title">${e.isClass ? "🏫 " : ""}${e.title}</div>
+              <div class="event-meta">
+                ${e.time || ""}${e.location ? " · " + e.location : ""}
+              </div>
+              ${!e.isClass
+                ? `<button class="del-btn"
+                     onclick="window._deleteEvent('${e.id}')">🗑</button>`
+                : ""}
+            </div>`)
+          .join("")
+        : `<p class="no-events">Keine Ereignisse für diesen Tag</p>`
+      }
+    </div>`;
+}
+
+window._changeMonth = d => {
+  calendarDate.setMonth(calendarDate.getMonth() + d);
+  renderTab("calendar");
+};
+window._showDay = key => {
+  const [y, m, dd] = key.split("-");
+  calendarDate = new Date(+y, +m - 1, +dd);
+  renderTab("calendar");
+};
+window._deleteEvent = async id => {
+  if (!confirm("Ereignis löschen?")) return;
+  await deleteDoc(doc(db, "events", id));
+  await loadCalendarEvents();
+  renderTab("calendar");
+};
+window._openAddEvent = () => {
+  const today = calendarDate.toISOString().substring(0, 10);
+  showModal("Ereignis hinzufügen", `
+    <label>Titel</label>
+    <input id="evTitle" placeholder="z. B. Mathematiktest">
+    <label>Datum</label>
+    <input type="date" id="evDate" value="${today}">
+    <label>Uhrzeit</label>
+    <input type="time" id="evTime">
+    <label>Ort</label>
+    <input id="evLocation" placeholder="z. B. Raum 12">
+    <button class="modal-btn" onclick="window._saveEvent()">Speichern</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+window._saveEvent = async () => {
+  const title    = document.getElementById("evTitle").value.trim();
+  const date     = document.getElementById("evDate").value;
+  const time     = document.getElementById("evTime").value;
+  const location = document.getElementById("evLocation").value.trim();
+  if (!title || !date) return toast("Titel und Datum sind Pflichtfelder", "error");
+  try {
+    await addDoc(collection(db, "events"), {
+      uid: currentUser.uid, title, date, time, location,
+      createdAt: serverTimestamp()
+    });
+    closeModal();
+    await loadCalendarEvents();
+    renderTab("calendar");
+    toast("Ereignis gespeichert ✓", "success");
+  } catch (e) { toast("Fehler: " + e.message, "error"); }
+};
+
+// ─────────────────────────────────────────────
+//  PERSONS
+// ─────────────────────────────────────────────
+async function renderPersons(el) {
+  const canAdd = currentUserData?.role === "admin"
+              || currentUserData?.role === "teacher";
+  el.innerHTML = `
+    <div class="page-header">
+      <h2>👥 Personen</h2>
+      ${canAdd ? `<button class="fab-inline"
+                    onclick="window._openAddUser()"
+                    title="Nutzer anlegen">＋</button>` : ""}
+    </div>
+    <div class="persons-list" id="personsList">
+      <div class="spinner"></div>
+    </div>`;
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    const list = snap.docs.map(d => d.data())
+      .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    document.getElementById("personsList").innerHTML = list.length
+      ? list.map(u => `
+          <div class="person-card">
+            <div class="person-avatar">
+              ${(u.name?.[0] || "?").toUpperCase()}
+            </div>
+            <div class="person-info">
+              <div class="person-name">${u.name}</div>
+              <div class="person-email">${u.email}</div>
+            </div>
+            <div class="person-badge">${roleLabel(u.role)}</div>
+          </div>`).join("")
+      : `<p class="no-events">Keine Nutzer gefunden</p>`;
+  } catch (e) {
+    document.getElementById("personsList").innerHTML =
+      `<p class="error-msg">${e.message}</p>`;
+  }
+}
+
+window._openAddUser = () => {
+  showModal("Neuen Nutzer anlegen", `
+    <label>Name</label>
+    <input id="nuName" placeholder="Vollständiger Name">
+    <label>E-Mail</label>
+    <input type="email" id="nuEmail" placeholder="name@schule.de">
+    <label>Rolle</label>
+    <select id="nuRole">
+      <option value="student">🎒 Schüler</option>
+      <option value="teacher">🎓 Lehrer</option>
+      <option value="admin">👑 Admin</option>
+    </select>
+    <button class="modal-btn" onclick="window._createUser()">Account erstellen</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+
+window._createUser = async () => {
+  const name  = document.getElementById("nuName").value.trim();
+  const email = document.getElementById("nuEmail").value.trim();
+  const role  = document.getElementById("nuRole").value;
+  if (!name || !email) return toast("Name und E-Mail sind Pflichtfelder", "error");
+  const pass = generatePassword();
+  try {
+    // Zweite Firebase-App-Instanz, damit der aktuelle Login nicht unterbrochen wird
+    const secondaryApp  = initializeApp(firebaseConfig, "tmp-" + Date.now());
+    const secondaryAuth = getAuth(secondaryApp);
+    const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pass);
+    await signOut(secondaryAuth);
+
+    await setDoc(doc(db, "users", cred.user.uid), {
+      name, email, role, uid: cred.user.uid, createdAt: serverTimestamp()
+    });
+
+    closeModal();
+    const safeEmail = email.replace(/'/g, "\\'");
+    const safePass  = pass.replace(/'/g, "\\'");
+    showModal("✅ Account erstellt", `
+      <p style="color:var(--text-sec);margin-bottom:12px;">
+        Bitte teile diese Zugangsdaten sicher mit der Person:
+      </p>
+      <div class="cred-box">
+        <div><strong>E-Mail:</strong> ${email}</div>
+        <div><strong>Passwort:</strong> ${pass}</div>
+      </div>
+      <button class="modal-btn"
+        onclick="navigator.clipboard.writeText('E-Mail: ${safeEmail}\\nPasswort: ${safePass}');
+                 toast('Kopiert!','success')">
+        📋 Zugangsdaten kopieren
+      </button>
+      <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Schließen</button>`);
+
+    renderTab("persons");
+  } catch (e) { toast("Fehler: " + e.message, "error"); }
+};
+
+// ─────────────────────────────────────────────
+//  CLASS
+// ─────────────────────────────────────────────
+async function renderClass(el) {
+  el.innerHTML = `
+    <div class="page-header"><h2>🏫 Klasse</h2></div>
+    <div id="classContent"><div class="spinner"></div></div>`;
+  try {
+    const role = currentUserData?.role;
+    if (role === "student") {
+      const myClassId = currentUserData?.classId;
+      if (!myClassId) {
+        document.getElementById("classContent").innerHTML =
+          `<p class="no-events">Du bist noch keiner Klasse zugewiesen.</p>`;
+        return;
+      }
+      await renderClassDetail(document.getElementById("classContent"), myClassId);
+    } else {
+      const snap = await getDocs(
+        query(collection(db, "classes"),
+          where("creatorId", "==", currentUser.uid))
+      );
+      const classes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      document.getElementById("classContent").innerHTML = `
+        <div class="page-header" style="margin-top:0">
+          <span style="flex:1"></span>
+          <button class="fab-inline"
+                  onclick="window._openCreateClass()"
+                  title="Neue Klasse">＋</button>
+        </div>
+        ${classes.length
+          ? classes.map(c => `
+              <div class="class-card"
+                   onclick="window._openClassDetail('${c.id}')">
+                <div class="class-name">${c.name}</div>
+                <div class="class-meta">
+                  ${(c.memberIds || []).length} Mitglieder
+                </div>
+              </div>`).join("")
+          : `<p class="no-events">Noch keine Klassen erstellt.</p>`}`;
+    }
+  } catch (e) {
+    document.getElementById("classContent").innerHTML =
+      `<p class="error-msg">${e.message}</p>`;
+  }
+}
+
+window._openClassDetail = async classId => {
+  const main = document.getElementById("mainContent");
+  main.innerHTML = `<div class="spinner"></div>`;
+  await renderClassDetail(main, classId);
+};
+
+async function renderClassDetail(el, classId) {
+  try {
+    const classDoc  = await getDoc(doc(db, "classes", classId));
+    const classData = { id: classDoc.id, ...classDoc.data() };
+
+    const memberSnap = await getDocs(
+      query(collection(db, "users"), where("classId", "==", classId))
+    );
+    const members = memberSnap.docs.map(d => d.data());
+
+    const evSnap = await getDocs(
+      query(collection(db, "classEvents"), where("classId", "==", classId))
+    );
+    const events = evSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    const canEdit = currentUserData?.role === "admin"
+                 || currentUserData?.role === "teacher";
+
+    el.innerHTML = `
+      <div class="page-header">
+        <button class="icon-btn" onclick="renderTab('class')">‹ Zurück</button>
+        <h2>${classData.name}</h2>
+        ${canEdit
+          ? `<button class="fab-inline"
+                     onclick="window._openShareEvent('${classId}')"
+                     title="Ereignis teilen">＋</button>`
+          : ""}
+      </div>
+
+      ${events.length ? `
+        <div class="class-events-section">
+          <div class="section-title">📢 Geteilte Ereignisse</div>
+          ${events.map(e => `
+            <div class="class-event-item">
+              <div class="event-title">${e.title}</div>
+              <div class="event-meta">
+                ${e.date || ""}${e.time ? " · " + e.time : ""}
+                ${e.location ? " · " + e.location : ""}
+              </div>
+              <button class="add-to-cal-btn"
+                onclick="window._addClassEventToCal(
+                  '${e.id}',
+                  '${(e.title||"").replace(/'/g,"\\'")}',
+                  '${e.date||""}',
+                  '${e.time||""}',
+                  '${(e.location||"").replace(/'/g,"\\'")}')">
+                📅 Zum Kalender
+              </button>
+            </div>`).join("")}
+        </div>` : ""}
+
+      <div class="section-title">👥 Mitglieder (${members.length})</div>
+      ${members.map(m => `
+        <div class="person-card">
+          <div class="person-avatar">
+            ${(m.name?.[0] || "?").toUpperCase()}
+          </div>
+          <div class="person-info">
+            <div class="person-name">${m.name}</div>
+            <div class="person-email">${m.email}</div>
+          </div>
+          <div class="person-badge">${roleLabel(m.role)}</div>
+        </div>`).join("")}`;
+  } catch (e) {
+    el.innerHTML = `<p class="error-msg">${e.message}</p>`;
+  }
+}
+
+window._addClassEventToCal = async (id, title, date, time, location) => {
+  try {
+    await addDoc(collection(db, "events"), {
+      uid: currentUser.uid, title, date, time, location,
+      fromClassEvent: id, createdAt: serverTimestamp()
+    });
+    toast("Zum Kalender hinzugefügt ✓", "success");
+  } catch (e) { toast("Fehler: " + e.message, "error"); }
+};
+
+window._openCreateClass = async () => {
+  const snap  = await getDocs(collection(db, "users"));
+  const users = snap.docs.map(d => d.data());
+  showModal("Neue Klasse erstellen", `
+    <label>Klassenname</label>
+    <input id="clName" placeholder="z. B. 10b">
+    <label>Mitglieder auswählen</label>
+    <div class="member-select-list">
+      ${users.map(u => `
+        <label class="member-check">
+          <input type="checkbox" value="${u.uid}">
+          ${u.name} (${roleLabel(u.role)})
+        </label>`).join("")}
+    </div>
+    <button class="modal-btn" onclick="window._saveClass()">Erstellen</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+
+window._saveClass = async () => {
+  const name    = document.getElementById("clName").value.trim();
+  const checked = Array.from(
+    document.querySelectorAll(".member-check input:checked")
+  ).map(i => i.value);
+  if (!name) return toast("Klassenname ist Pflichtfeld", "error");
+  try {
+    const ref = await addDoc(collection(db, "classes"), {
+      name, creatorId: currentUser.uid,
+      memberIds: checked, createdAt: serverTimestamp()
+    });
+    for (const uid of checked) {
+      const uSnap = await getDocs(
+        query(collection(db, "users"), where("uid", "==", uid))
+      );
+      if (!uSnap.empty)
+        await updateDoc(uSnap.docs[0].ref, { classId: ref.id });
+    }
+    closeModal();
+    toast("Klasse erstellt ✓", "success");
+    renderTab("class");
+  } catch (e) { toast("Fehler: " + e.message, "error"); }
+};
+
+window._openShareEvent = classId => {
+  showModal("Ereignis mit Klasse teilen", `
+    <label>Titel</label>
+    <input id="ceTitle" placeholder="z. B. Klassenfahrt">
+    <label>Datum</label>
+    <input type="date" id="ceDate">
+    <label>Uhrzeit</label>
+    <input type="time" id="ceTime">
+    <label>Ort (optional)</label>
+    <input id="ceLocation" placeholder="z. B. Aula">
+    <button class="modal-btn"
+            onclick="window._shareClassEvent('${classId}')">
+      Teilen
+    </button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+
+window._shareClassEvent = async classId => {
+  const title    = document.getElementById("ceTitle").value.trim();
+  const date     = document.getElementById("ceDate").value;
+  const time     = document.getElementById("ceTime").value;
+  const location = document.getElementById("ceLocation").value.trim();
+  if (!title || !date) return toast("Titel und Datum sind Pflicht", "error");
+  try {
+    await addDoc(collection(db, "classEvents"), {
+      classId, title, date, time, location,
+      creatorId: currentUser.uid, createdAt: serverTimestamp()
+    });
+    closeModal();
+    toast("Ereignis geteilt ✓", "success");
+    window._openClassDetail(classId);
+  } catch (e) { toast("Fehler: " + e.message, "error"); }
+};
+
+// ─────────────────────────────────────────────
+//  NEWS
+// ─────────────────────────────────────────────
+async function renderNews(el) {
+  const isAdmin = currentUserData?.role === "admin";
+  el.innerHTML = `
+    <div class="page-header">
+      <h2>📰 News</h2>
+      ${isAdmin
+        ? `<button class="fab-inline"
+                   onclick="window._openAddNews()"
+                   title="News hinzufügen">＋</button>`
+        : ""}
+    </div>
+    <div id="newsList"><div class="spinner"></div></div>`;
+  try {
+    const snap = await getDocs(
+      query(collection(db, "news"), orderBy("createdAt", "desc"))
+    );
+    document.getElementById("newsList").innerHTML = snap.empty
+      ? `<p class="no-events">Keine News vorhanden</p>`
+      : snap.docs.map(d => {
+          const n = d.data();
+          const dateStr = n.date
+            || (n.createdAt?.toDate?.()?.toLocaleDateString("de-DE") || "");
+          return `
+            <div class="news-card">
+              <div class="news-date">${dateStr}</div>
+              <div class="news-title">${n.title}</div>
+              ${n.body
+                ? `<div class="news-body">${n.body}</div>` : ""}
+            </div>`;
+        }).join("");
+  } catch (e) {
+    document.getElementById("newsList").innerHTML =
+      `<p class="error-msg">${e.message}</p>`;
+  }
+}
+
+window._openAddNews = () => {
+  showModal("News hinzufügen", `
+    <label>Titel</label>
+    <input id="nwTitle" placeholder="z. B. Schulausflug">
+    <label>Datum</label>
+    <input type="date" id="nwDate">
+    <label>Inhalt</label>
+    <textarea id="nwBody" rows="4" placeholder="Details…"></textarea>
+    <button class="modal-btn" onclick="window._saveNews()">Veröffentlichen</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+
+window._saveNews = async () => {
+  const title = document.getElementById("nwTitle").value.trim();
+  const date  = document.getElementById("nwDate").value;
+  const body  = document.getElementById("nwBody").value.trim();
+  if (!title) return toast("Titel ist Pflichtfeld", "error");
+  try {
+    await addDoc(collection(db, "news"), {
+      title, date, body,
+      authorId: currentUser.uid, createdAt: serverTimestamp()
+    });
+    closeModal();
+    toast("News veröffentlicht ✓", "success");
+    renderTab("news");
+  } catch (e) { toast("Fehler: " + e.message, "error"); }
+};
+
+// ─────────────────────────────────────────────
+//  PROFILE
+// ─────────────────────────────────────────────
+function renderProfile(el) {
+  el.innerHTML = `
+    <div class="profile-wrap">
+      <div class="profile-avatar-large">
+        ${(currentUserData?.name?.[0] || "?").toUpperCase()}
+      </div>
+      <div class="profile-name">${currentUserData?.name || "Unbekannt"}</div>
+      <div class="profile-email">${currentUserData?.email || ""}</div>
+      <div class="profile-role">${roleLabel(currentUserData?.role)}</div>
+      <div class="profile-actions">
+        <button class="profile-btn" onclick="window._openChangeName()">
+          ✏️ Name ändern
+        </button>
+        <button class="profile-btn" onclick="window._sendPasswordReset()">
+          🔐 Passwort-Reset per E-Mail
+        </button>
+        <button class="profile-btn profile-btn--logout"
+                onclick="window._logoutUser()">
+          🚪 Abmelden
+        </button>
+      </div>
+    </div>`;
+}
+
+window._openChangeName = () => {
+  showModal("Name ändern", `
+    <label>Neuer Name</label>
+    <input id="newNameInput" value="${currentUserData?.name || ""}">
+    <button class="modal-btn" onclick="window._saveName()">Speichern</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+
+window._saveName = async () => {
+  const name = document.getElementById("newNameInput").value.trim();
+  if (!name) return toast("Name darf nicht leer sein", "error");
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), { name });
+    currentUserData.name = name;
+    closeModal();
+    toast("Name aktualisiert ✓", "success");
+    renderTab("profile");
+  } catch (e) { toast("Fehler: " + e.message, "error"); }
+};
+
+window._sendPasswordReset = async () => {
+  try {
+    await sendPasswordResetEmail(auth, currentUser.email);
+    toast(`Reset-E-Mail an ${currentUser.email} gesendet ✓`, "success");
+  } catch (e) { toast("Fehler: " + e.message, "error"); }
+};
+
+window._logoutUser = async () => {
+  await signOut(auth);
+  showLoginScreen();
+};
+
+// ─────────────────────────────────────────────
+//  AUTH SCREENS
+// ─────────────────────────────────────────────
+function showLoginScreen() {
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("appShell").style.display    = "none";
+  currentUser = null;
+  currentUserData = null;
+}
+
+function showApp() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("appShell").style.display    = "flex";
+  renderTab("home");
+}
+
+async function loginUser() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass  = document.getElementById("loginPass").value;
+  const btn   = document.getElementById("loginBtn");
+  if (!email || !pass)
+    return toast("Bitte E-Mail und Passwort eingeben", "error");
+  btn.disabled    = true;
+  btn.textContent = "Anmelden…";
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    currentUser     = cred.user;
+    const userDoc   = await getDoc(doc(db, "users", currentUser.uid));
+    if (!userDoc.exists())
+      throw new Error("Nutzerprofil nicht gefunden. Bitte Admin kontaktieren.");
+    currentUserData = userDoc.data();
+    await loadCalendarEvents();
+    showApp();
+  } catch (e) {
+    toast(translateAuthError(e.code || e.message), "error");
+    btn.disabled    = false;
+    btn.textContent = "Anmelden";
+  }
+}
+
+function translateAuthError(code) {
+  const map = {
+    "auth/wrong-password":    "Falsches Passwort",
+    "auth/invalid-credential":"Falsche E-Mail oder Passwort",
+    "auth/user-not-found":    "Kein Konto mit dieser E-Mail",
+    "auth/invalid-email":     "Ungültige E-Mail-Adresse",
+    "auth/too-many-requests": "Zu viele Versuche. Bitte warte kurz."
+  };
+  return map[code] || code;
+}
+
+// ─────────────────────────────────────────────
+//  BOOT
+// ─────────────────────────────────────────────
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    try {
+      const d = await getDoc(doc(db, "users", user.uid));
+      if (d.exists()) {
+        currentUser     = user;
+        currentUserData = d.data();
+        await loadCalendarEvents();
+        showApp();
+      } else {
+        showLoginScreen();
+      }
+    } catch {
+      showLoginScreen();
+    }
+  } else {
+    showLoginScreen();
+  }
+});
+
+// Event listeners
+document.getElementById("loginBtn")
+  .addEventListener("click", loginUser);
+document.getElementById("loginEmail")
+  .addEventListener("keydown", e => e.key === "Enter" && loginUser());
+document.getElementById("loginPass")
+  .addEventListener("keydown", e => e.key === "Enter" && loginUser());
+
+document.querySelectorAll(".nav-btn").forEach(b =>
+  b.addEventListener("click", () => renderTab(b.dataset.tab))
+);
+
+document.getElementById("modalOverlay").addEventListener("click", e => {
+  if (e.target === document.getElementById("modalOverlay")) closeModal();
+});
+</script>
+
+</body>
+</html>
