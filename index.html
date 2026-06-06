@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SchulApp</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+<!-- SVG Icon Library (inline, kein Internet nötig) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <!-- home -->
+  <symbol id="ic-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/>
+  </symbol>
+  <!-- calendar -->
+  <symbol id="ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+  </symbol>
+  <!-- class/school -->
+  <symbol id="ic-class" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+  </symbol>
+  <!-- notes -->
+  <symbol id="ic-notes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+  </symbol>
+  <!-- news -->
+  <symbol id="ic-news" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a4 4 0 01-4-4V6"/><line x1="16" y1="7" x2="10" y2="7"/><line x1="16" y1="11" x2="10" y2="11"/><line x1="16" y1="15" x2="10" y2="15"/>
+  </symbol>
+  <!-- profile -->
+  <symbol id="ic-profile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </symbol>
+  <!-- persons -->
+  <symbol id="ic-persons" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+  </symbol>
+  <!-- timetable -->
+  <symbol id="ic-timetable" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+  </symbol>
+  <!-- plus -->
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </symbol>
+  <!-- back arrow -->
+  <symbol id="ic-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="15 18 9 12 15 6"/>
+  </symbol>
+  <!-- trash -->
+  <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+  </symbol>
+  <!-- edit pencil -->
+  <symbol id="ic-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+  </symbol>
+  <!-- lock -->
+  <symbol id="ic-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+  </symbol>
+  <!-- logout -->
+  <symbol id="ic-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+  </symbol>
+</svg>
+
+<style>
+:root {
+  --bg:#0a0a0f; --surface:#13131a; --surface2:#1c1c27; --surface3:#242433;
+  --accent:#6c63ff; --accent-glow:rgba(108,99,255,.35);
+  --accent2:#ff6b6b; --accent3:#43e97b;
+  --text-primary:#f0f0ff; --text-sec:#8888aa;
+  --border:rgba(255,255,255,.08);
+  --radius:14px; --radius-sm:8px;
+  --shadow:0 8px 32px rgba(0,0,0,.6);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text-primary);font-family:"Segoe UI",system-ui,sans-serif;overflow:hidden;}
+
+/* ── SVG icon helper ── */
+.icon{display:inline-block;width:20px;height:20px;flex-shrink:0;}
+.icon--lg{width:24px;height:24px;}
+.icon--sm{width:16px;height:16px;}
+
+/* ── LOGIN ── */
+#loginScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:24px;background-image:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(108,99,255,.3),transparent);}
+.login-logo{font-size:52px;margin-bottom:8px;}
+.login-brand{font-size:28px;font-weight:700;letter-spacing:.06em;}
+.login-sub{color:var(--text-sec);margin-bottom:36px;font-size:14px;}
+.login-card{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow);}
+.login-card label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase;}
+.login-card input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text-primary);font-size:15px;margin-bottom:18px;transition:border-color .2s;}
+.login-card input:focus{outline:none;border-color:var(--accent);}
+#loginBtn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:4px;}
+#loginBtn:hover{opacity:.88;}#loginBtn:active{transform:scale(.98);}#loginBtn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ── APP SHELL ── */
+#appShell{display:none;flex-direction:column;height:100vh;}
+.main-content{flex:1;overflow-y:auto;padding:20px 16px 90px;scrollbar-width:none;}
+.main-content::-webkit-scrollbar{display:none;}
+.fade-in{animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── NAVBAR ── */
+.navbar{display:flex;background:var(--surface);border-top:1px solid var(--border);padding:6px 0 calc(6px + env(safe-area-inset-bottom));flex-shrink:0;z-index:100;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text-sec);cursor:pointer;padding:6px 2px;font-size:10px;transition:color .2s;}
+.nav-btn .nav-icon{width:22px;height:22px;transition:transform .2s;}
+.nav-btn.active{color:var(--accent);}
+.nav-btn.active .nav-icon{transform:translateY(-2px);}
+
+/* ── HOME ── */
+.home-hero{text-align:center;padding:32px 16px 24px;background:linear-gradient(135deg,var(--surface2),var(--surface3));border-radius:var(--radius);border:1px solid var(--border);margin-bottom:20px;}
+.home-greeting{font-size:16px;color:var(--text-sec);}
+.home-name{font-size:32px;font-weight:700;letter-spacing:-.01em;}
+.home-role-badge{display:inline-block;background:var(--accent);color:#fff;border-radius:20px;padding:3px 12px;font-size:12px;margin:10px 0 18px;}
+.home-clock{font-size:42px;font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;}
+.home-date{color:var(--text-sec);font-size:14px;margin-top:6px;}
+.home-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.home-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 8px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:background .2s,transform .1s;}
+.home-card:hover{background:var(--surface2);transform:translateY(-2px);}
+.home-card-icon{width:28px;height:28px;color:var(--accent);}
+.card-label{font-size:13px;color:var(--text-sec);text-align:center;font-weight:500;}
+
+/* ── CALENDAR ── */
+.cal-topbar{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+.cal-month-label{flex:1;text-align:center;font-size:17px;font-weight:600;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px;}
+.cal-header-cell{text-align:center;font-size:11px;color:var(--text-sec);padding:4px 0;font-weight:600;}
+.cal-cell{aspect-ratio:1;background:var(--surface);border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border:1px solid transparent;transition:background .15s;gap:2px;}
+.cal-cell:hover{background:var(--surface2);}
+.cal-cell.today{border-color:var(--accent);background:rgba(108,99,255,.15);}
+.cal-cell.empty{background:transparent;border:none;cursor:default;}
+.cal-day-num{font-size:13px;}
+.cal-dot{background:var(--accent);color:#fff;border-radius:50%;font-size:9px;width:15px;height:15px;display:flex;align-items:center;justify-content:center;}
+.cal-dot--class{background:var(--accent3);}
+.cal-events-list{display:flex;flex-direction:column;gap:10px;}
+.event-item{background:var(--surface);border-left:3px solid var(--accent);border-radius:var(--radius-sm);padding:12px 14px;position:relative;}
+.event-item--class{border-color:var(--accent3);}
+.event-title{font-weight:600;font-size:14px;padding-right:28px;}
+.event-meta{font-size:12px;color:var(--text-sec);margin-top:3px;}
+.del-btn{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:var(--text-sec);display:flex;align-items:center;}
+
+/* ── PERSONS ── */
+.persons-list{display:flex;flex-direction:column;gap:10px;}
+.person-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:14px;}
+.person-avatar{width:42px;height:42px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;}
+.person-info{flex:1;min-width:0;}
+.person-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.person-email{font-size:12px;color:var(--text-sec);}
+.person-badge{font-size:11px;color:var(--text-sec);white-space:nowrap;}
+
+/* ── CLASS ── */
+.class-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;margin-bottom:10px;transition:background .15s;}
+.class-card:hover{background:var(--surface2);}
+.class-name{font-size:18px;font-weight:700;}
+.class-meta{color:var(--text-sec);font-size:13px;margin-top:4px;}
+.class-events-section{margin-bottom:18px;}
+.class-event-item{background:var(--surface);border-left:3px solid var(--accent3);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;}
+.add-to-cal-btn{margin-top:8px;background:var(--accent);color:#fff;border:none;border-radius:20px;padding:5px 14px;font-size:12px;cursor:pointer;}
+.section-title{font-size:13px;color:var(--text-sec);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 10px;}
+
+/* ── NOTES ── */
+.notes-list{display:flex;flex-direction:column;gap:10px;}
+.note-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:background .15s,transform .1s;border-left:3px solid var(--accent);}
+.note-card:hover{background:var(--surface2);transform:translateY(-1px);}
+.note-card-title{font-weight:600;font-size:15px;}
+.note-card-date{font-size:11px;color:var(--text-sec);margin-top:4px;}
+.note-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.note-detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;}
+.note-detail-title{font-size:20px;font-weight:700;flex:1;}
+.note-detail-actions{display:flex;gap:8px;flex-shrink:0;}
+.note-action-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-primary);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:5px;}
+.note-action-btn:hover{background:var(--surface3);}
+.note-action-btn--delete{border-color:var(--accent2);color:var(--accent2);}
+.note-detail-body{font-size:14px;color:var(--text-sec);line-height:1.7;white-space:pre-wrap;}
+
+/* ── TIMETABLE ── */
+.tt-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tt-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+.tt-table{border-collapse:collapse;min-width:500px;width:100%;}
+.tt-table th{background:var(--surface2);color:var(--text-sec);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:10px 6px;text-align:center;border:1px solid var(--border);}
+.tt-table td{border:1px solid var(--border);padding:0;vertical-align:top;min-width:80px;}
+.tt-row-label{background:var(--surface2);font-size:12px;color:var(--text-sec);text-align:center;padding:8px 4px;font-weight:600;white-space:nowrap;}
+.tt-cell{min-height:52px;padding:6px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:600;cursor:pointer;transition:filter .15s;border-radius:0;}
+.tt-cell:hover{filter:brightness(1.2);}
+.tt-cell-empty{color:var(--text-sec);font-size:11px;}
+.tt-edit-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.tt-edit-row{background:var(--surface2);border-radius:var(--radius-sm);padding:12px;display:flex;flex-direction:column;gap:8px;}
+.tt-edit-label{font-size:12px;color:var(--text-sec);font-weight:600;}
+.tt-edit-inputs{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.tt-edit-inputs input{flex:1;min-width:120px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text-primary);font-size:13px;}
+.tt-edit-inputs input:focus{outline:none;border-color:var(--accent);}
+.color-picker-row{display:flex;gap:6px;flex-wrap:wrap;}
+.color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;}
+.color-swatch.selected{border-color:#fff;transform:scale(1.2);}
+
+/* ── NEWS ── */
+.news-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;}
+.news-date{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.news-title{font-size:17px;font-weight:700;margin-bottom:8px;}
+.news-body{font-size:14px;color:var(--text-sec);line-height:1.6;}
+
+/* ── PROFILE ── */
+.profile-wrap{display:flex;flex-direction:column;align-items:center;padding:24px 16px;}
+.profile-avatar-large{width:80px;height:80px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;box-shadow:0 0 0 4px var(--accent-glow);margin-bottom:14px;}
+.profile-name{font-size:22px;font-weight:700;}
+.profile-email{color:var(--text-sec);font-size:14px;margin:4px 0;}
+.profile-role{color:var(--accent);font-size:13px;margin-bottom:24px;}
+.profile-actions{width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;}
+.profile-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-primary);border-radius:var(--radius-sm);padding:13px 16px;font-size:14px;cursor:pointer;text-align:left;transition:background .15s;display:flex;align-items:center;gap:10px;}
+.profile-btn:hover{background:var(--surface2);}
+.profile-btn--logout{border-color:var(--accent2);color:var(--accent2);}
+
+/* ── SHARED ── */
+.page-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.page-header h2{flex:1;font-size:20px;font-weight:700;}
+.fab-inline{width:36px;height:36px;border-radius:50%;background:var(--accent);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px var(--accent-glow);flex-shrink:0;}
+.icon-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-primary);border-radius:var(--radius-sm);padding:7px 12px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.no-events{color:var(--text-sec);font-size:14px;text-align:center;padding:24px;}
+.error-msg{color:var(--accent2);font-size:14px;padding:20px;text-align:center;}
+
+/* ── MODAL ── */
+#modalOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:flex-end;justify-content:center;}
+#modalOverlay.active{display:flex;}
+.modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:24px;max-height:85vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.22,1,.36,1);}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.modal-sheet h3{font-size:18px;font-weight:700;margin-bottom:18px;}
+.modal-sheet label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;}
+.modal-sheet input,.modal-sheet select,.modal-sheet textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;color:var(--text-primary);font-size:14px;margin-bottom:14px;font-family:inherit;}
+.modal-sheet input:focus,.modal-sheet select:focus,.modal-sheet textarea:focus{outline:none;border-color:var(--accent);}
+.modal-sheet textarea{resize:vertical;}
+.modal-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
+.modal-btn--secondary{background:var(--surface2);color:var(--text-primary);margin-top:8px;}
+.member-select-list{max-height:200px;overflow-y:auto;margin-bottom:14px;}
+.member-check{display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;cursor:pointer;}
+.member-check:hover{background:var(--surface3);}
+.member-check input{width:auto;margin:0;}
+.cred-box{background:var(--surface2);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:14px;margin:12px 0;font-size:14px;line-height:2;}
+
+/* ── TOAST ── */
+#toastContainer{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:10px 20px;font-size:13px;white-space:nowrap;opacity:0;transition:opacity .3s,transform .3s;transform:translateY(-8px);}
+.toast.show{opacity:1;transform:none;}
+.toast--success{border-color:var(--accent3);color:var(--accent3);}
+.toast--error{border-color:var(--accent2);color:var(--accent2);}
+
+/* ── SPINNER ── */
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:40px auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+select option{background:var(--surface2);}
+</style>
+</head>
+<body>
+
+<!-- SVG Icon helper function output placeholder -->
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-logo">🎓</div>
+  <div class="login-brand">SchulApp</div>
+  <div class="login-sub">Nur für autorisierte Mitglieder</div>
+  <div class="login-card">
+    <label for="loginEmail">E-Mail</label>
+    <input id="loginEmail" type="email" placeholder="name@schule.de" autocomplete="email">
+    <label for="loginPass">Passwort</label>
+    <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+    <button id="loginBtn">Anmelden</button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell">
+  <div class="main-content" id="mainContent"></div>
+  <nav class="navbar">
+    <button class="nav-btn" data-tab="home">
+      <svg class="nav-icon"><use href="#ic-home"/></svg>Home
+    </button>
+    <button class="nav-btn" data-tab="calendar">
+      <svg class="nav-icon"><use href="#ic-calendar"/></svg>Kalender
+    </button>
+    <button class="nav-btn" data-tab="class">
+      <svg class="nav-icon"><use href="#ic-class"/></svg>Klasse
+    </button>
+    <button class="nav-btn" data-tab="notes">
+      <svg class="nav-icon"><use href="#ic-notes"/></svg>Notizen
+    </button>
+    <button class="nav-btn" data-tab="news">
+      <svg class="nav-icon"><use href="#ic-news"/></svg>News
+    </button>
+    <button class="nav-btn" data-tab="profile">
+      <svg class="nav-icon"><use href="#ic-profile"/></svg>Profil
+    </button>
+  </nav>
+</div>
+
+<!-- MODAL -->
+<div id="modalOverlay">
+  <div class="modal-sheet">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut,
+  sendPasswordResetEmail, createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, collection,
+  getDocs, addDoc, query, where, orderBy,
+  deleteDoc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── FIREBASE CONFIG ──────────────────────────
+const firebaseConfig = {
+  apiKey:            "DEIN_API_KEY",
+  authDomain:        "DEIN_PROJECT.firebaseapp.com",
+  projectId:         "DEIN_PROJECT_ID",
+  messagingSenderId: "DEIN_SENDER_ID",
+  appId:             "DEIN_APP_ID"
+};
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── AES ENCRYPTION ───────────────────────────
+// Verschlüsselt: Ereignistitel, Notizen, Klassenevents, News-Inhalt
+// NICHT verschlüsselt: Namen (für Suche/Anzeige), E-Mails (Auth)
+function encKey(uid) { return "SchulApp_v3_" + uid; }
+function enc(text, uid) {
+  if (!text || !uid) return text || "";
+  try { return CryptoJS.AES.encrypt(String(text), encKey(uid)).toString(); }
+  catch(e) { return text; }
+}
+function dec(cipher, uid) {
+  if (!cipher || !uid) return cipher || "";
+  try {
+    const b = CryptoJS.AES.decrypt(cipher, encKey(uid));
+    const s = b.toString(CryptoJS.enc.Utf8);
+    return s || cipher; // fallback if not encrypted yet
+  } catch(e) { return cipher; }
+}
+
+// ── STATE ────────────────────────────────────
+let currentUser     = null;
+let currentUserData = null;
+let calendarDate    = new Date();
+let calendarEvents  = [];
+let classEvents     = [];
+
+// Stundenplan: { Mo:[{subject,color},...10], Di:[...], Mi:[...], Do:[...], Fr:[...] }
+const TT_DAYS  = ["Mo","Di","Mi","Do","Fr"];
+const TT_FULL  = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag"];
+const TT_HOURS = 10;
+const TT_COLORS = ["#6c63ff","#ff6b6b","#43e97b","#f7b731","#45aaf2","#fd9644","#a55eea","#26de81","#fc5c65","#2bcbba"];
+
+// ── UTILITIES ────────────────────────────────
+function generatePassword(len=12) {
+  const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$";
+  return Array.from({length:len},()=>c[Math.floor(Math.random()*c.length)]).join("");
+}
+function toast(msg,type="info"){
+  const t=document.createElement("div");
+  t.className=`toast toast--${type}`;t.textContent=msg;
+  document.getElementById("toastContainer").appendChild(t);
+  setTimeout(()=>t.classList.add("show"),10);
+  setTimeout(()=>{t.classList.remove("show");setTimeout(()=>t.remove(),400);},3500);
+}
+function roleLabel(r){
+  if(r==="admin") return "Admin";
+  if(r==="teacher") return "Lehrer";
+  return "Schüler";
+}
+function svg(id,cls="icon"){
+  return `<svg class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
+}
+function showModal(title,bodyHTML){
+  document.getElementById("modalTitle").textContent=title;
+  document.getElementById("modalBody").innerHTML=bodyHTML;
+  document.getElementById("modalOverlay").classList.add("active");
+}
+function closeModal(){document.getElementById("modalOverlay").classList.remove("active");}
+window.closeModal=closeModal;
+
+// ── ROUTER ───────────────────────────────────
+function renderTab(tab){
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+  const main=document.getElementById("mainContent");
+  main.innerHTML="";main.className="main-content fade-in";
+  switch(tab){
+    case"home":     renderHome(main);     break;
+    case"calendar": renderCalendar(main); break;
+    case"persons":  renderPersons(main);  break;
+    case"class":    renderClass(main);    break;
+    case"notes":    renderNotes(main);    break;
+    case"news":     renderNews(main);     break;
+    case"profile":  renderProfile(main);  break;
+    case"timetable":renderTimetable(main);break;
+  }
+}
+window.renderTab=renderTab;
+
+// ── HOME ─────────────────────────────────────
+function renderHome(el){
+  const now=new Date();
+  const ts=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  const ds=now.toLocaleDateString("de-DE",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  el.innerHTML=`
+    <div class="home-hero">
+      <div class="home-greeting">Hallo,</div>
+      <div class="home-name">${currentUserData?.name||"Benutzer"}</div>
+      <div class="home-role-badge">${roleLabel(currentUserData?.role)}</div>
+      <div class="home-clock" id="homeClock">${ts}</div>
+      <div class="home-date">${ds}</div>
+    </div>
+    <div class="home-cards">
+      <div class="home-card" onclick="renderTab('persons')">
+        ${svg("ic-persons","home-card-icon")}
+        <span class="card-label">Personen</span>
+      </div>
+      <div class="home-card" onclick="renderTab('news')">
+        ${svg("ic-news","home-card-icon")}
+        <span class="card-label">Neuigkeiten</span>
+      </div>
+      <div class="home-card" onclick="renderTab('calendar')">
+        ${svg("ic-calendar","home-card-icon")}
+        <span class="card-label">Kalender</span>
+      </div>
+      <div class="home-card" onclick="renderTab('timetable')">
+        ${svg("ic-timetable","home-card-icon")}
+        <span class="card-label">Stundenplan</span>
+      </div>
+    </div>`;
+  const timer=setInterval(()=>{
+    const c=document.getElementById("homeClock");
+    if(!c){clearInterval(timer);return;}
+    c.textContent=new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  },1000);
+}
+
+// ── CALENDAR ─────────────────────────────────
+async function loadCalendarEvents(){
+  if(!currentUser)return;
+  try{
+    const snap=await getDocs(query(collection(db,"events"),where("uid","==",currentUser.uid)));
+    calendarEvents=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(currentUserData?.classId){
+      const cs=await getDocs(query(collection(db,"classEvents"),where("classId","==",currentUserData.classId)));
+      classEvents=cs.docs.map(d=>({id:d.id,...d.data(),isClass:true}));
+    } else {classEvents=[];}
+  }catch(e){console.error(e);}
+}
+
+function renderCalendar(el){
+  const year=calendarDate.getFullYear(),month=calendarDate.getMonth();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const firstDay=(new Date(year,month,1).getDay()+6)%7;
+  const today=new Date();
+  const mNames=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+  const dNames=["Mo","Di","Mi","Do","Fr","Sa","So"];
+
+  const eventDays={};
+  [...calendarEvents,...classEvents].forEach(ev=>{
+    const d=(ev.date||"").substring(0,10);
+    if(d){if(!eventDays[d])eventDays[d]=[];eventDays[d].push(ev);}
+  });
+
+  let grid=dNames.map(d=>`<div class="cal-header-cell">${d}</div>`).join("");
+  grid+=Array(firstDay).fill('<div class="cal-cell empty"></div>').join("");
+  for(let d=1;d<=daysInMonth;d++){
+    const key=`${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const isToday=d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear();
+    const evs=eventDays[key]||[];
+    const dc=evs.some(e=>e.isClass)?"cal-dot cal-dot--class":"cal-dot";
+    grid+=`<div class="cal-cell ${isToday?"today":""}" onclick="window._showDay('${key}')">
+      <span class="cal-day-num">${d}</span>
+      ${evs.length?`<span class="${dc}">${evs.length}</span>`:""}
+    </div>`;
+  }
+
+  const selKey=`${calendarDate.getFullYear()}-${String(calendarDate.getMonth()+1).padStart(2,"0")}-${String(calendarDate.getDate()).padStart(2,"0")}`;
+  const selEvs=eventDays[selKey]||[];
+
+  el.innerHTML=`
+    <div class="cal-topbar">
+      <button class="icon-btn" onclick="window._changeMonth(-1)">${svg("ic-back","icon")}</button>
+      <span class="cal-month-label">${mNames[month]} ${year}</span>
+      <button class="icon-btn" onclick="window._changeMonth(1)" style="transform:scaleX(-1)">${svg("ic-back","icon")}</button>
+      <button class="fab-inline" onclick="window._openAddEvent()" title="Ereignis hinzufügen">${svg("ic-plus","icon")}</button>
+    </div>
+    <div class="cal-grid">${grid}</div>
+    <div class="cal-events-list">
+      ${selEvs.length
+        ?selEvs.map(e=>{
+            // Decrypt title for display
+            const title=e.isClass?dec(e.title,currentUser.uid):dec(e.title,currentUser.uid);
+            const loc=e.location?dec(e.location,currentUser.uid):"";
+            return`<div class="event-item ${e.isClass?"event-item--class":""}">
+              <div class="event-title">${title}</div>
+              <div class="event-meta">${e.time||""}${loc?" · "+loc:""}</div>
+              ${!e.isClass?`<button class="del-btn" onclick="window._deleteEvent('${e.id}')" title="Löschen">${svg("ic-trash","icon icon--sm")}</button>`:""}
+            </div>`;}).join("")
+        :`<p class="no-events">Keine Ereignisse für diesen Tag</p>`}
+    </div>`;
+}
+
+window._changeMonth=d=>{calendarDate.setMonth(calendarDate.getMonth()+d);renderTab("calendar");};
+window._showDay=key=>{const[y,m,dd]=key.split("-");calendarDate=new Date(+y,+m-1,+dd);renderTab("calendar");};
+window._deleteEvent=async id=>{
+  if(!confirm("Ereignis löschen?"))return;
+  await deleteDoc(doc(db,"events",id));
+  await loadCalendarEvents();renderTab("calendar");
+};
+window._openAddEvent=()=>{
+  const today=calendarDate.toISOString().substring(0,10);
+  showModal("Ereignis hinzufügen",`
+    <label>Titel</label><input id="evTitle" placeholder="z. B. Mathematiktest">
+    <label>Datum</label><input type="date" id="evDate" value="${today}">
+    <label>Uhrzeit</label><input type="time" id="evTime">
+    <label>Ort</label><input id="evLocation" placeholder="z. B. Raum 12">
+    <button class="modal-btn" onclick="window._saveEvent()">Speichern</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+window._saveEvent=async()=>{
+  const title=document.getElementById("evTitle").value.trim();
+  const date=document.getElementById("evDate").value;
+  const time=document.getElementById("evTime").value;
+  const location=document.getElementById("evLocation").value.trim();
+  if(!title||!date)return toast("Titel und Datum sind Pflichtfelder","error");
+  try{
+    // AES-verschlüsselt speichern
+    await addDoc(collection(db,"events"),{
+      uid:currentUser.uid,
+      title:enc(title,currentUser.uid),
+      date, time,
+      location:enc(location,currentUser.uid),
+      createdAt:serverTimestamp()
+    });
+    closeModal();await loadCalendarEvents();renderTab("calendar");
+    toast("Ereignis gespeichert ✓","success");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+
+// ── PERSONS ──────────────────────────────────
+async function renderPersons(el){
+  const canAdd=currentUserData?.role==="admin"||currentUserData?.role==="teacher";
+  el.innerHTML=`
+    <div class="page-header">
+      <button class="icon-btn" onclick="renderTab('home')">${svg("ic-back","icon")} Zurück</button>
+      <h2>Personen</h2>
+      ${canAdd?`<button class="fab-inline" onclick="window._openAddUser()" title="Nutzer anlegen">${svg("ic-plus","icon")}</button>`:""}
+    </div>
+    <div class="persons-list" id="personsList"><div class="spinner"></div></div>`;
+  try{
+    const snap=await getDocs(collection(db,"users"));
+    const list=snap.docs.map(d=>d.data()).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+    document.getElementById("personsList").innerHTML=list.length
+      ?list.map(u=>`
+          <div class="person-card">
+            <div class="person-avatar">${(u.name?.[0]||"?").toUpperCase()}</div>
+            <div class="person-info">
+              <div class="person-name">${u.name}</div>
+              <div class="person-email">${u.email}</div>
+            </div>
+            <div class="person-badge">${roleLabel(u.role)}</div>
+          </div>`).join("")
+      :`<p class="no-events">Keine Nutzer gefunden</p>`;
+  }catch(e){document.getElementById("personsList").innerHTML=`<p class="error-msg">${e.message}</p>`;}
+}
+
+window._openAddUser=()=>{
+  showModal("Neuen Nutzer anlegen",`
+    <label>Name</label><input id="nuName" placeholder="Vollständiger Name">
+    <label>E-Mail</label><input type="email" id="nuEmail" placeholder="name@schule.de">
+    <label>Rolle</label>
+    <select id="nuRole">
+      <option value="student">Schüler</option>
+      <option value="teacher">Lehrer</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button class="modal-btn" onclick="window._createUser()">Account erstellen</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+window._createUser=async()=>{
+  const name=document.getElementById("nuName").value.trim();
+  const email=document.getElementById("nuEmail").value.trim();
+  const role=document.getElementById("nuRole").value;
+  if(!name||!email)return toast("Name und E-Mail sind Pflichtfelder","error");
+  const pass=generatePassword();
+  try{
+    const secondaryApp=initializeApp(firebaseConfig,"tmp-"+Date.now());
+    const secondaryAuth=getAuth(secondaryApp);
+    const cred=await createUserWithEmailAndPassword(secondaryAuth,email,pass);
+    await signOut(secondaryAuth);
+    await setDoc(doc(db,"users",cred.user.uid),{name,email,role,uid:cred.user.uid,createdAt:serverTimestamp()});
+    closeModal();
+    const safeEmail=email.replace(/'/g,"\\'");
+    const safePass=pass.replace(/'/g,"\\'");
+    showModal("Account erstellt",`
+      <p style="color:var(--text-sec);margin-bottom:12px;">Teile diese Zugangsdaten sicher mit der Person:</p>
+      <div class="cred-box">
+        <div><strong>E-Mail:</strong> ${email}</div>
+        <div><strong>Passwort:</strong> ${pass}</div>
+      </div>
+      <button class="modal-btn" onclick="navigator.clipboard.writeText('E-Mail: ${safeEmail}\\nPasswort: ${safePass}');toast('Kopiert!','success')">Zugangsdaten kopieren</button>
+      <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Schließen</button>`);
+    renderTab("persons");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+
+// ── CLASS ─────────────────────────────────────
+async function renderClass(el){
+  el.innerHTML=`<div class="page-header"><h2>Klasse</h2></div><div id="classContent"><div class="spinner"></div></div>`;
+  try{
+    const role=currentUserData?.role;
+    if(role==="student"){
+      const myClassId=currentUserData?.classId;
+      if(!myClassId){document.getElementById("classContent").innerHTML=`<p class="no-events">Du bist noch keiner Klasse zugewiesen.</p>`;return;}
+      await renderClassDetail(document.getElementById("classContent"),myClassId);
+    }else{
+      const snap=await getDocs(query(collection(db,"classes"),where("creatorId","==",currentUser.uid)));
+      const classes=snap.docs.map(d=>({id:d.id,...d.data()}));
+      document.getElementById("classContent").innerHTML=`
+        <div class="page-header" style="margin-top:0">
+          <span style="flex:1"></span>
+          <button class="fab-inline" onclick="window._openCreateClass()" title="Neue Klasse">${svg("ic-plus","icon")}</button>
+        </div>
+        ${classes.length
+          ?classes.map(c=>`<div class="class-card" onclick="window._openClassDetail('${c.id}')">
+              <div class="class-name">${dec(c.name,currentUser.uid)}</div>
+              <div class="class-meta">${(c.memberIds||[]).length} Mitglieder</div>
+            </div>`).join("")
+          :`<p class="no-events">Noch keine Klassen erstellt.</p>`}`;
+    }
+  }catch(e){document.getElementById("classContent").innerHTML=`<p class="error-msg">${e.message}</p>`;}
+}
+
+window._openClassDetail=async classId=>{
+  const main=document.getElementById("mainContent");main.innerHTML=`<div class="spinner"></div>`;
+  await renderClassDetail(main,classId);
+};
+
+async function renderClassDetail(el,classId){
+  try{
+    const classDoc=await getDoc(doc(db,"classes",classId));
+    const cd={id:classDoc.id,...classDoc.data()};
+    const memberSnap=await getDocs(query(collection(db,"users"),where("classId","==",classId)));
+    const members=memberSnap.docs.map(d=>d.data());
+    const evSnap=await getDocs(query(collection(db,"classEvents"),where("classId","==",classId)));
+    const events=evSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const canEdit=currentUserData?.role==="admin"||currentUserData?.role==="teacher";
+    el.innerHTML=`
+      <div class="page-header">
+        <button class="icon-btn" onclick="renderTab('class')">${svg("ic-back","icon")} Zurück</button>
+        <h2>${dec(cd.name,currentUser.uid)}</h2>
+        ${canEdit?`<button class="fab-inline" onclick="window._openShareEvent('${classId}')" title="Ereignis teilen">${svg("ic-plus","icon")}</button>`:""}
+      </div>
+      ${events.length?`<div class="class-events-section">
+        <div class="section-title">Geteilte Ereignisse</div>
+        ${events.map(e=>`<div class="class-event-item">
+          <div class="event-title">${dec(e.title,currentUser.uid)}</div>
+          <div class="event-meta">${e.date||""}${e.time?" · "+e.time:""}${e.location?" · "+dec(e.location,currentUser.uid):""}</div>
+          <button class="add-to-cal-btn" onclick="window._addClassEventToCal('${e.id}','${enc(dec(e.title,currentUser.uid),currentUser.uid).replace(/'/g,"\\'")}','${e.date||""}','${e.time||""}','${enc(dec(e.location||"",currentUser.uid),currentUser.uid).replace(/'/g,"\\'")}')">Zum Kalender</button>
+        </div>`).join("")}
+      </div>`:""}
+      <div class="section-title">Mitglieder (${members.length})</div>
+      ${members.map(m=>`<div class="person-card">
+        <div class="person-avatar">${(m.name?.[0]||"?").toUpperCase()}</div>
+        <div class="person-info"><div class="person-name">${m.name}</div><div class="person-email">${m.email}</div></div>
+        <div class="person-badge">${roleLabel(m.role)}</div>
+      </div>`).join("")}`;
+  }catch(e){el.innerHTML=`<p class="error-msg">${e.message}</p>`;}
+}
+
+window._addClassEventToCal=async(id,encTitle,date,time,encLoc)=>{
+  try{
+    await addDoc(collection(db,"events"),{uid:currentUser.uid,title:encTitle,date,time,location:encLoc,fromClassEvent:id,createdAt:serverTimestamp()});
+    toast("Zum Kalender hinzugefügt ✓","success");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+
+window._openCreateClass=async()=>{
+  const snap=await getDocs(collection(db,"users"));
+  const users=snap.docs.map(d=>d.data());
+  showModal("Neue Klasse erstellen",`
+    <label>Klassenname</label><input id="clName" placeholder="z. B. 10b">
+    <label>Mitglieder auswählen</label>
+    <div class="member-select-list">
+      ${users.map(u=>`<label class="member-check"><input type="checkbox" value="${u.uid}"> ${u.name} (${roleLabel(u.role)})</label>`).join("")}
+    </div>
+    <button class="modal-btn" onclick="window._saveClass()">Erstellen</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+window._saveClass=async()=>{
+  const name=document.getElementById("clName").value.trim();
+  const checked=Array.from(document.querySelectorAll(".member-check input:checked")).map(i=>i.value);
+  if(!name)return toast("Klassenname ist Pflichtfeld","error");
+  try{
+    const ref=await addDoc(collection(db,"classes"),{
+      name:enc(name,currentUser.uid),
+      creatorId:currentUser.uid,memberIds:checked,createdAt:serverTimestamp()
+    });
+    for(const uid of checked){
+      const uSnap=await getDocs(query(collection(db,"users"),where("uid","==",uid)));
+      if(!uSnap.empty)await updateDoc(uSnap.docs[0].ref,{classId:ref.id});
+    }
+    closeModal();toast("Klasse erstellt ✓","success");renderTab("class");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+window._openShareEvent=classId=>{
+  showModal("Ereignis mit Klasse teilen",`
+    <label>Titel</label><input id="ceTitle" placeholder="z. B. Klassenfahrt">
+    <label>Datum</label><input type="date" id="ceDate">
+    <label>Uhrzeit</label><input type="time" id="ceTime">
+    <label>Ort (optional)</label><input id="ceLocation" placeholder="z. B. Aula">
+    <button class="modal-btn" onclick="window._shareClassEvent('${classId}')">Teilen</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+window._shareClassEvent=async classId=>{
+  const title=document.getElementById("ceTitle").value.trim();
+  const date=document.getElementById("ceDate").value;
+  const time=document.getElementById("ceTime").value;
+  const location=document.getElementById("ceLocation").value.trim();
+  if(!title||!date)return toast("Titel und Datum sind Pflicht","error");
+  try{
+    await addDoc(collection(db,"classEvents"),{
+      classId,
+      title:enc(title,currentUser.uid),
+      date,time,
+      location:enc(location,currentUser.uid),
+      creatorId:currentUser.uid,createdAt:serverTimestamp()
+    });
+    closeModal();toast("Ereignis geteilt ✓","success");window._openClassDetail(classId);
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+
+// ── NOTES ────────────────────────────────────
+async function renderNotes(el){
+  el.innerHTML=`
+    <div class="page-header">
+      <h2>Notizen</h2>
+      <button class="fab-inline" onclick="window._openAddNote()" title="Neue Notiz">${svg("ic-plus","icon")}</button>
+    </div>
+    <div class="notes-list" id="notesList"><div class="spinner"></div></div>`;
+  try{
+    const snap=await getDocs(query(collection(db,"notes"),where("uid","==",currentUser.uid),orderBy("createdAt","desc")));
+    if(snap.empty){document.getElementById("notesList").innerHTML=`<p class="no-events">Noch keine Notizen vorhanden</p>`;return;}
+    document.getElementById("notesList").innerHTML=snap.docs.map(d=>{
+      const n=d.data();
+      const decTitle=dec(n.title,currentUser.uid);
+      const dateStr=n.createdAt?.toDate?.()?.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"})||"";
+      return`<div class="note-card" onclick="window._openNote('${d.id}')">
+        <div class="note-card-title">${decTitle}</div>
+        <div class="note-card-date">${dateStr}</div>
+      </div>`;
+    }).join("");
+  }catch(e){document.getElementById("notesList").innerHTML=`<p class="error-msg">${e.message}</p>`;}
+}
+
+window._openAddNote=()=>{
+  showModal("Neue Notiz",`
+    <label>Titel</label><input id="ntTitle" placeholder="Notizthema…">
+    <label>Text</label><textarea id="ntBody" rows="6" placeholder="Schreibe deine Notiz hier…"></textarea>
+    <button class="modal-btn" onclick="window._saveNote(null)">Speichern</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+window._saveNote=async(existingId)=>{
+  const titleInput=document.getElementById("ntTitle").value.trim();
+  const bodyInput=document.getElementById("ntBody").value.trim();
+  if(!titleInput)return toast("Titel ist Pflichtfeld","error");
+  const encTitle=enc(titleInput,currentUser.uid);
+  const encBody=enc(bodyInput,currentUser.uid);
+  try{
+    if(existingId){
+      await updateDoc(doc(db,"notes",existingId),{title:encTitle,body:encBody,updatedAt:serverTimestamp()});
+      toast("Notiz aktualisiert ✓","success");
+    }else{
+      await addDoc(collection(db,"notes"),{uid:currentUser.uid,title:encTitle,body:encBody,createdAt:serverTimestamp()});
+      toast("Notiz gespeichert ✓","success");
+    }
+    closeModal();renderTab("notes");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+window._openNote=async noteId=>{
+  try{
+    const snap=await getDoc(doc(db,"notes",noteId));
+    if(!snap.exists())return toast("Notiz nicht gefunden","error");
+    const n=snap.data();
+    const decTitle=dec(n.title,currentUser.uid);
+    const decBody=dec(n.body,currentUser.uid);
+    const main=document.getElementById("mainContent");
+    main.innerHTML=`
+      <div class="page-header">
+        <button class="icon-btn" onclick="renderTab('notes')">${svg("ic-back","icon")} Zurück</button>
+        <h2>Notiz</h2>
+      </div>
+      <div class="note-detail">
+        <div class="note-detail-header">
+          <div class="note-detail-title">${decTitle}</div>
+          <div class="note-detail-actions">
+            <button class="note-action-btn" onclick="window._editNote('${noteId}')">${svg("ic-edit","icon icon--sm")} Bearbeiten</button>
+            <button class="note-action-btn note-action-btn--delete" onclick="window._deleteNote('${noteId}')">${svg("ic-trash","icon icon--sm")} Löschen</button>
+          </div>
+        </div>
+        <div class="note-detail-body">${decBody||`<span style="color:var(--text-sec)">Kein Text vorhanden</span>`}</div>
+      </div>`;
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+window._editNote=async noteId=>{
+  try{
+    const snap=await getDoc(doc(db,"notes",noteId));
+    if(!snap.exists())return;
+    const n=snap.data();
+    const decTitle=dec(n.title,currentUser.uid);
+    const decBody=dec(n.body,currentUser.uid);
+    showModal("Notiz bearbeiten",`
+      <label>Titel</label><input id="ntTitle" value="${decTitle.replace(/"/g,"&quot;")}">
+      <label>Text</label><textarea id="ntBody" rows="6">${decBody}</textarea>
+      <button class="modal-btn" onclick="window._saveNote('${noteId}')">Speichern</button>
+      <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+window._deleteNote=async noteId=>{
+  if(!confirm("Notiz wirklich löschen?"))return;
+  try{await deleteDoc(doc(db,"notes",noteId));toast("Notiz gelöscht","success");renderTab("notes");}
+  catch(e){toast("Fehler: "+e.message,"error");}
+};
+
+// ── TIMETABLE ────────────────────────────────
+// Lokal gespeichert in Firestore unter timetables/{uid}
+// Struktur: { Mo: [{subject,color}, ...], Di: [...], ... }
+let ttData = {}; // current timetable data
+
+async function loadTimetable(){
+  try{
+    const snap=await getDoc(doc(db,"timetables",currentUser.uid));
+    if(snap.exists()) ttData=snap.data();
+    else ttData={};
+  }catch(e){ttData={};}
+}
+
+async function saveTimetable(){
+  try{
+    await setDoc(doc(db,"timetables",currentUser.uid),ttData);
+    toast("Stundenplan gespeichert ✓","success");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+}
+
+async function renderTimetable(el){
+  await loadTimetable();
+  _renderTTView(el);
+}
+
+function _renderTTView(el){
+  // Build table
+  let thead=`<tr><th style="min-width:60px">Stunde</th>${TT_FULL.map(d=>`<th>${d}</th>`).join("")}</tr>`;
+  let tbody="";
+  for(let h=0;h<TT_HOURS;h++){
+    let row=`<td class="tt-row-label">${h+1}.</td>`;
+    TT_DAYS.forEach(day=>{
+      const cell=(ttData[day]||[])[h];
+      if(cell&&cell.subject){
+        const bg=cell.color||"#6c63ff";
+        // calculate text color based on brightness
+        const r=parseInt(bg.slice(1,3),16),g=parseInt(bg.slice(3,5),16),b=parseInt(bg.slice(5,7),16);
+        const brightness=(r*299+g*587+b*114)/1000;
+        const fg=brightness>140?"#111":"#fff";
+        row+=`<td><div class="tt-cell" style="background:${bg};color:${fg}">${cell.subject}</div></td>`;
+      }else{
+        row+=`<td><div class="tt-cell"><span class="tt-cell-empty">–</span></div></td>`;
+      }
+    });
+    tbody+=`<tr>${row}</tr>`;
+  }
+
+  el.innerHTML=`
+    <div class="page-header">
+      <button class="icon-btn" onclick="renderTab('home')">${svg("ic-back","icon")} Zurück</button>
+      <h2>Stundenplan</h2>
+      <button class="icon-btn" onclick="window._openEditTimetable()">${svg("ic-edit","icon")} Bearbeiten</button>
+    </div>
+    <div class="tt-wrap">
+      <table class="tt-table">
+        <thead>${thead}</thead>
+        <tbody>${tbody}</tbody>
+      </table>
+    </div>`;
+}
+
+window._openEditTimetable=()=>{
+  // Build edit form: for each day, for each hour one input
+  const swatches=TT_COLORS.map((c,i)=>`<span class="color-swatch" style="background:${c}" data-color="${c}" onclick="window._selectSwatch(this)"></span>`).join("");
+
+  let rows="";
+  for(let h=0;h<TT_HOURS;h++){
+    let inputs=TT_DAYS.map(day=>{
+      const cell=(ttData[day]||[])[h]||{};
+      return`<input class="tt-inp" data-day="${day}" data-hour="${h}"
+        placeholder="${TT_FULL[TT_DAYS.indexOf(day)].substring(0,2)}"
+        value="${cell.subject||""}"
+        style="background:${cell.color||"var(--surface)"};color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:6px;width:100%;font-size:12px;"
+        onfocus="window._focusInp(this)">`;
+    }).join("");
+    rows+=`<div class="tt-edit-row">
+      <div class="tt-edit-label">${h+1}. Stunde</div>
+      <div class="tt-edit-inputs">${inputs}</div>
+    </div>`;
+  }
+
+  showModal("Stundenplan bearbeiten",`
+    <p style="color:var(--text-sec);font-size:13px;margin-bottom:12px;">Klicke ein Fach, wähle dann eine Farbe.</p>
+    <div style="margin-bottom:14px;">
+      <label>Farbe für ausgewähltes Fach</label>
+      <div class="color-picker-row" id="swatchRow">${swatches}</div>
+    </div>
+    <div class="tt-edit-grid" id="ttEditGrid">${rows}</div>
+    <button class="modal-btn" onclick="window._saveTimetableFromModal()" style="margin-top:16px;">Speichern</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+
+  window._lastFocusedInp=null;
+};
+
+window._focusInp=function(inp){window._lastFocusedInp=inp;};
+
+window._selectSwatch=function(el){
+  document.querySelectorAll(".color-swatch").forEach(s=>s.classList.remove("selected"));
+  el.classList.add("selected");
+  if(window._lastFocusedInp){
+    const color=el.dataset.color;
+    window._lastFocusedInp.style.background=color;
+    // store color on element
+    window._lastFocusedInp.dataset.color=color;
+  }
+};
+
+window._saveTimetableFromModal=async()=>{
+  // gather all inputs
+  const newData={};
+  TT_DAYS.forEach(day=>newData[day]=Array(TT_HOURS).fill(null).map(()=>({})));
+  document.querySelectorAll(".tt-inp").forEach(inp=>{
+    const day=inp.dataset.day;
+    const h=parseInt(inp.dataset.hour);
+    const subject=inp.value.trim();
+    const color=inp.dataset.color||(ttData[day]||[])[h]?.color||TT_COLORS[0];
+    newData[day][h]={subject,color};
+  });
+  ttData=newData;
+  await saveTimetable();
+  closeModal();
+  // re-render
+  const main=document.getElementById("mainContent");
+  _renderTTView(main);
+};
+
+// ── NEWS ─────────────────────────────────────
+async function renderNews(el){
+  const isAdmin=currentUserData?.role==="admin";
+  el.innerHTML=`
+    <div class="page-header">
+      <h2>News</h2>
+      ${isAdmin?`<button class="fab-inline" onclick="window._openAddNews()" title="News hinzufügen">${svg("ic-plus","icon")}</button>`:""}
+    </div>
+    <div id="newsList"><div class="spinner"></div></div>`;
+  try{
+    const snap=await getDocs(query(collection(db,"news"),orderBy("createdAt","desc")));
+    document.getElementById("newsList").innerHTML=snap.empty
+      ?`<p class="no-events">Keine News vorhanden</p>`
+      :snap.docs.map(d=>{
+          const n=d.data();
+          const dateStr=n.date||(n.createdAt?.toDate?.()?.toLocaleDateString("de-DE")||"");
+          const decTitle=dec(n.title,currentUser.uid);
+          const decBody=n.body?dec(n.body,currentUser.uid):"";
+          return`<div class="news-card">
+            <div class="news-date">${dateStr}</div>
+            <div class="news-title">${decTitle}</div>
+            ${decBody?`<div class="news-body">${decBody}</div>`:""}
+          </div>`;
+        }).join("");
+  }catch(e){document.getElementById("newsList").innerHTML=`<p class="error-msg">${e.message}</p>`;}
+}
+
+window._openAddNews=()=>{
+  showModal("News hinzufügen",`
+    <label>Titel</label><input id="nwTitle" placeholder="z. B. Schulausflug">
+    <label>Datum</label><input type="date" id="nwDate">
+    <label>Inhalt</label><textarea id="nwBody" rows="4" placeholder="Details…"></textarea>
+    <button class="modal-btn" onclick="window._saveNews()">Veröffentlichen</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+window._saveNews=async()=>{
+  const title=document.getElementById("nwTitle").value.trim();
+  const date=document.getElementById("nwDate").value;
+  const body=document.getElementById("nwBody").value.trim();
+  if(!title)return toast("Titel ist Pflichtfeld","error");
+  try{
+    await addDoc(collection(db,"news"),{
+      title:enc(title,currentUser.uid),
+      date,
+      body:enc(body,currentUser.uid),
+      authorId:currentUser.uid,createdAt:serverTimestamp()
+    });
+    closeModal();toast("News veröffentlicht ✓","success");renderTab("news");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+
+// ── PROFILE ──────────────────────────────────
+function renderProfile(el){
+  el.innerHTML=`
+    <div class="profile-wrap">
+      <div class="profile-avatar-large">${(currentUserData?.name?.[0]||"?").toUpperCase()}</div>
+      <div class="profile-name">${currentUserData?.name||"Unbekannt"}</div>
+      <div class="profile-email">${currentUserData?.email||""}</div>
+      <div class="profile-role">${roleLabel(currentUserData?.role)}</div>
+      <div class="profile-actions">
+        <button class="profile-btn" onclick="window._openChangeName()">${svg("ic-edit","icon")} Name ändern</button>
+        <button class="profile-btn" onclick="window._sendPasswordReset()">${svg("ic-lock","icon")} Passwort-Reset per E-Mail</button>
+        <button class="profile-btn profile-btn--logout" onclick="window._logoutUser()">${svg("ic-logout","icon")} Abmelden</button>
+      </div>
+    </div>`;
+}
+window._openChangeName=()=>{
+  showModal("Name ändern",`
+    <label>Neuer Name</label><input id="newNameInput" value="${currentUserData?.name||""}">
+    <button class="modal-btn" onclick="window._saveName()">Speichern</button>
+    <button class="modal-btn modal-btn--secondary" onclick="closeModal()">Abbrechen</button>`);
+};
+window._saveName=async()=>{
+  const name=document.getElementById("newNameInput").value.trim();
+  if(!name)return toast("Name darf nicht leer sein","error");
+  try{
+    await updateDoc(doc(db,"users",currentUser.uid),{name});
+    currentUserData.name=name;closeModal();
+    toast("Name aktualisiert ✓","success");renderTab("profile");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+window._sendPasswordReset=async()=>{
+  try{
+    await sendPasswordResetEmail(auth,currentUser.email);
+    toast(`Reset-E-Mail an ${currentUser.email} gesendet ✓`,"success");
+  }catch(e){toast("Fehler: "+e.message,"error");}
+};
+window._logoutUser=async()=>{await signOut(auth);showLoginScreen();};
+
+// ── AUTH ─────────────────────────────────────
+function showLoginScreen(){
+  document.getElementById("loginScreen").style.display="flex";
+  document.getElementById("appShell").style.display="none";
+  currentUser=null;currentUserData=null;
+}
+function showApp(){
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("appShell").style.display="flex";
+  renderTab("home");
+}
+async function loginUser(){
+  const email=document.getElementById("loginEmail").value.trim();
+  const pass=document.getElementById("loginPass").value;
+  const btn=document.getElementById("loginBtn");
+  if(!email||!pass)return toast("Bitte E-Mail und Passwort eingeben","error");
+  btn.disabled=true;btn.textContent="Anmelden…";
+  try{
+    const cred=await signInWithEmailAndPassword(auth,email,pass);
+    currentUser=cred.user;
+    const userDoc=await getDoc(doc(db,"users",currentUser.uid));
+    if(!userDoc.exists())throw new Error("Nutzerprofil nicht gefunden. Bitte Admin kontaktieren.");
+    currentUserData=userDoc.data();
+    await loadCalendarEvents();
+    showApp();
+  }catch(e){
+    toast(translateAuthError(e.code||e.message),"error");
+    btn.disabled=false;btn.textContent="Anmelden";
+  }
+}
+function translateAuthError(code){
+  const map={
+    "auth/wrong-password":"Falsches Passwort",
+    "auth/invalid-credential":"Falsche E-Mail oder Passwort",
+    "auth/user-not-found":"Kein Konto mit dieser E-Mail",
+    "auth/invalid-email":"Ungültige E-Mail-Adresse",
+    "auth/too-many-requests":"Zu viele Versuche. Bitte warte kurz."
+  };
+  return map[code]||code;
+}
+
+// ── BOOT ─────────────────────────────────────
+auth.onAuthStateChanged(async user=>{
+  if(user){
+    try{
+      const d=await getDoc(doc(db,"users",user.uid));
+      if(d.exists()){
+        currentUser=user;currentUserData=d.data();
+        await loadCalendarEvents();showApp();
+      }else{showLoginScreen();}
+    }catch{showLoginScreen();}
+  }else{showLoginScreen();}
+});
+
+document.getElementById("loginBtn").addEventListener("click",loginUser);
+document.getElementById("loginEmail").addEventListener("keydown",e=>e.key==="Enter"&&loginUser());
+document.getElementById("loginPass").addEventListener("keydown",e=>e.key==="Enter"&&loginUser());
+document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>renderTab(b.dataset.tab)));
+document.getElementById("modalOverlay").addEventListener("click",e=>{
+  if(e.target===document.getElementById("modalOverlay"))closeModal();
+});
+</script>
+</body>
+</html>
